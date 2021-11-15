@@ -1,0 +1,52 @@
+Pitch: Predicting Efficiency (Miles per Gallon) of Cars
+========================================================
+author: Julian Jordi
+date: Nov 15th, 2021
+autosize: true
+
+Idea
+========================================================
+
+We revisit the prediction models built in the "Regression" Course of the Data Science Specialization Curriculum.
+
+In that course, we built several linear models to predict the `mpg` value of cars in the `mtcars` dataset.
+
+In this Shiny App, we compare two of them:
+
+- a `naive` model, which predicts `mpg` solely based on the transmission type of the car
+- a `better` model, which predicts `mpg` based on the transmission type, horsepower and weight of the car
+
+Data Preparation
+========================================================
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+data("mtcars")
+mtcars <- mtcars %>%
+    mutate(transmission = as.factor(mtcars$am), rowId = row.names(mtcars))
+
+levels(mtcars$transmission) = c("automatic", "manual")
+
+naive_model <- lm(mpg ~ transmission, data = mtcars)
+better_model <- lm(mpg ~ transmission + hp + wt, data = mtcars)
+naive_model
+```
+
+The `naive` Model only Predicts two Distinct Values
+========================================================
+The `naive` model uses `transmission`, a factor with two levels, as its sole predictor. So it naturally only produces two distinct predictive values for `mpg`. This is not a very good model.
+
+```{r fig.height=5, fig.width=10, message=FALSE, warning=FALSE}
+ggplot(tibble(predicted = naive_model$fitted.values, carModel = names(naive_model$residuals))) +
+    geom_point(aes(x=carModel, y=predicted)) +
+    theme(text = element_text(size = 18), axis.text.x = element_text(angle = 90, size = 10))
+```
+
+
+The `better` Model is closer to the real Value
+========================================================
+The `better` model, as its name suggests, better predicts the real `mpg` value of a car.
+
+The point of the Shiny App is to make it easy to compare both models.
+
+Have fun playing around! Go here [https://delta-peg.shinyapps.io/mtcars_automatic_vs_manual_transmission](https://delta-peg.shinyapps.io/mtcars_automatic_vs_manual_transmission)
